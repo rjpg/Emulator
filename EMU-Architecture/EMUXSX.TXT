@@ -1,0 +1,238 @@
+                                XSX EMULATOR
+
+                                 BETA 1.0
+
+                (c) 2000 X-prog - Rui Jorge Pereira Gonáalves
+
+-Descriá∆o
+
+        Este produto contem um assemblador(Xcompile) e um emulador(emu).
+O assemblador(Xcompile) comverte a linguagem assembler em codigo binario,
+codigo esse que Ç interprertado pelo emulador(emu).
+
+-Maquina emulada
+
+        Registos
+        10 registos de 16 bits, R? (?=1-10)
+
+        Memoria de dados
+        Uma memoria com tamanho max. de 2^16
+        Endressamento de 16 bits
+        (cada posiá∆o de memoria (das 2^16) tem 16bits de tamanho)
+
+        Memoria de Codigo
+        Uma memoria com tamanho max. de 2^16
+        Instruá‰es com 32bits de tamanho max.
+        (cada posiá∆o de memoria de codigo(das 2^16) tem 32bits de tamanho)
+
+        Pilha
+        Uma Pilha com tamanho de 2^8
+        (cada posiá∆o de memoria da pilha(das 2^8) tem 16bits de tamanho)
+
+        Estado do processador
+        variavel gobal EXECUTING=1 se o processador estaÔa executar inst.
+
+        Program Counter
+        Variavel PROGRAMCOUNT de 16 bits (...precorre a memoria de instruá‰es)
+
+        OP CODE
+        Numero de 8 bits, 256 instruá‰es max.
+
+        Instruá‰es da maquina
+        32bits-0000 0000 0000 0000 0000 0000 0000 0000  - instruá∆o tipo
+                                             |OP-code|  - ins  
+                                        |R?| |OP-code|  - ins R?
+                                   |R?| |R?| |OP-code|  - ins R? R?
+                              |R?| |R?| |R?| |OP-code|  - ins R? R? R?
+               |      NUMBER     |           |op-code|  - ins NUMBER
+               |      NUMBER     |      |R?| |op-code|  - ins R? NUMBER
+               |      NUMBER     | |R?| |R?| |op-code|  - ins R? R? NUMBER
+               |      NUMBER2    | |NUMBER1| |op-code|  - ins NUMBER1 NUMBER2
+               |      NUMBER2    | |NUMBER1| |op-code|  - ins NUMBER1 NUMBER2
+
+
+
+-Ficheiros
+
+        Emu.c           -Codigo fonte do Emulador (C standart - 32Bit)
+        Emu.EXE         -Programa para windows (win32)
+        Xcompile.c      -Codigo fonte do Assemblador (C standart - 32Bit)
+        Xcompile.exe    -Programa para windows (win32)
+        sort.asx        -Exemplo de um programa em assembler do emulador
+        sort.xsm        -Exemplo de um programa pronto para correr no emulador.
+                         Assemblado no Xcompile.exe
+
+        NOTA IMPORTANTE: Para compilar e correr bem estes programas tem que
+                         estar num sistema operativo de 32-bits numa maquina
+                         de 32-bits.
+
+-Utilitarios
+
+Xcompile (assemblador) (ver descriá∆o da linguagem)
+
+        -Parametros
+
+         ficheiro de entrada-ficheiro com a linguagem Assembler.
+
+         ficheiro de saida  -ficheiro convertido em binario.
+
+
+emu      (emulador)
+
+        -Parametros
+
+         Ficheiro de entrada
+         Ficheiro com o codigo em binario para ser intrepertado.
+
+         -i
+         Informaá∆o sobre o nß de vezes que foi executada cada instruá∆o.
+
+         -c
+         Informaá∆o sobre o nß de ciclos que o programa "gasta"
+
+         -p (ainda n∆o esta pronto)
+         Informaá∆o sobre a estatistica de uso das instruá‰es de cada classe
+         
+         -d
+         Debugging do programa durante a "interpretaá∆o"
+
+         -m ???
+         Informaá∆o final sobre a memoria. "???" refere-se ao numero de
+         posiá‰es de memoria a mostrar a partir da posiá∆o 0.
+
+
+-Descriáao da linguagem (Compilada por Xcompile 1.00 Beta)
+
+        -Identificadores
+
+        "/"     - Identificador de comentarios
+                  (ainda n∆o esta 100% pronto: N∆o pode haver comentarios
+                  entre uma label e uma instruc∆o(entre um identificador
+                  e a instruá∆o seguinte)... SeraÔresolvido brevemente...)
+
+        ":"     - Indentificador de Labels
+
+        "*"     - Identificador de rotinas
+
+        "R"     - Identificador de regitos
+
+        "*START"- Identificador do inicio do programa
+
+        "@"     - Identificador de strigns (ainda n∆o pronto)
+
+
+        -Instruá‰es
+
+        "ADD"
+        Arg     : R? R? R?
+        Ciclos  : 1
+        Faz     : arg1=arg2+arg3
+
+        "SUB"
+        Arg     : R? R? R?
+        Ciclos  : 1
+        Faz     : arg1=arg2-arg3
+
+        "MUL"
+        Arg     : R? R? R?
+        Ciclos  : 2
+        Faz     : arg1=arg2*arg3
+
+        "DIV"
+        Arg     : R? R? R?
+        Ciclos  : 3
+        Faz     : arg1=arg2/arg3
+        
+        "NOT"
+        Arg     : R? R? 
+        Ciclos  : 1
+        Faz     : arg1= !arg2
+
+
+                (...)
+
+        "CSET"
+        Arg     : R? R? R?
+        Ciclos  : 2
+        Faz     : if(arg3) arg1=arg2
+
+        "SYS"
+        Arg     : NUMBER R?/NUMBER/@STR(String identificada)
+        Ciclos  : 10
+        Faz     : SYS 0         cpu stop
+                  SYS 1         Print stdout regs como inteiros
+                  SYS 2  R?     Print stdout R? como inteiro
+                  SYS 3  R?     Read  stdin R? como inteiro
+                  SYS 4  R?     Print stdout R? como char (N∆o pronto ainda)
+                  SYS 5  R?     Read  stdin R? como char (N∆o pronto ainda)
+                  SYS 6  NUMBER Print (String NUMBER) (N∆o pronto ainda)
+                  SYS 7  @STR   Print (String ) (N∆o pronto ainda)
+                  SYS 9         Nada ...
+
+        "PUS"
+        Arg     : R? 
+        Ciclos  : 2
+        Faz     : empilha arg1
+
+        "POP"
+        Arg     : R? 
+        Ciclos  : 2
+        Faz     : desempilha para arg1
+
+        "PUA"
+        Arg     :  
+        Ciclos  : 2
+        Faz     : empilha Todos os registos pus R1, pus R2 ... pus R10
+
+        "POA"
+        Arg     :  
+        Ciclos  : 2
+        Faz     : desempilha para os registos (pop R10, pop R9 ... pop R1)
+        
+
+        "PUC"
+        Arg     :  
+        Ciclos  : 2
+        Faz     : empilha o valor ("Progrma counter" +1)
+        
+        "POC"
+        Arg     :  
+        Ciclos  : 2
+        Faz     : desempilha para o "Progrma counter"  
+
+        "JAL"
+        Arg     : :LABEL 
+        Ciclos  : 2
+        Faz     : Salta para arg1 ("Progrma counter" = nß da instruá∆o
+                  identificada pela label)
+        
+        "JEQ"
+        Arg     : R? R? :LABEL 
+        Ciclos  : 2
+        Faz     : Salta para arg3 ("Progrma counter" = nß da instruá∆o
+                  identificada pela label), se arg1 == arg2.
+
+                (...)
+
+        "CALL"
+        Arg     : *ROTINE
+        Ciclos  : 2
+        Faz     : Salta para arg1 ("Progrma counter" = nß da instruá∆o
+                  identificada pelo arg1) e PUC (ver instruá∆o "PUC").
+
+        "RET"
+        Arg     : 
+        Ciclos  : 2
+        Faz     : POC(ver instruá∆o "POC") 
+
+                
+-Fim
+
+        -Recomendaá‰es
+                Enviar para c9807077@cca.fc.up.pt
+
+        -Data
+                27/05/2000
+
+        -Autor
+                Rui Jorge Pereira Gonáalves

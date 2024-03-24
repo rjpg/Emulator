@@ -1,0 +1,18 @@
+:START  SYS     3       R1
+:SD     SYS     3       R3
+        SW      R3      R2      0
+        ADDI    R2      R2      1
+        JNE     R1      R2      :SD
+
+:CI1    ADD     R5      R4      R10
+:CI2    LW      R6      R4      0
+        LW      R7      R5      0
+        JLE     R6      R7      :NTROCA
+        SW      R6      R5      0
+        SW      R7      R4      0
+:NTROCA ADDI    R5      R5      1
+        JNE     R5      R2      :CI2
+        ADDI    R4      R4      1
+        JNE     R4      R2      :CI1
+
+        SYS     0
